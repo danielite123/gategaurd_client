@@ -36,7 +36,9 @@ export default function OrderPage() {
       try {
         const token = localStorage.getItem('token');
         const response = await axios.get(
-          `http://localhost:5000/order/get-orders-by-user/${localStorage.getItem('userId')}`,
+          `https://gateguard-backend.onrender.com/order/get-orders-by-user/${localStorage.getItem(
+            'userId'
+          )}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

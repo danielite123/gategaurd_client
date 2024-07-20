@@ -50,10 +50,9 @@ const CheckoutForm = ({ order }) => {
       console.error('Error creating payment method:', error);
     } else {
       try {
-        const response = await axios.post('http://localhost:5000/order/payment', {
+        const response = await axios.post('https://gateguard-backend.onrender.com/order/payment', {
           amount: order.price, // Pass the amount to the backend
           payment_method_id: paymentMethod.id,
-          
         });
 
         if (response.data.error) {
@@ -97,11 +96,14 @@ export default function PaymentView(props) {
         try {
           const token = localStorage.getItem('token');
 
-          const response = await axios.get(`http://localhost:5000/order/get-order/${orderId}`, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
+          const response = await axios.get(
+            `https://gateguard-backend.onrender.com/order/get-order/${orderId}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
           setOrder(response.data);
         } catch (error) {
           console.error('Error fetching order details:', error);

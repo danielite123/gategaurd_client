@@ -120,7 +120,7 @@ export default function AppView(props) {
       try {
         const token = localStorage.getItem('token');
         const response = await axios.post(
-          'http://localhost:5000/order/create-order',
+          'https://gateguard-backend.onrender.com/order/create-order',
           {
             from: fromValue,
             to: toValue,

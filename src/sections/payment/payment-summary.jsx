@@ -23,11 +23,14 @@ export default function PaymentSummary(props) {
         try {
           const token = localStorage.getItem('token');
 
-          const response = await axios.get(`http://localhost:5000/order/get-order/${orderId}`, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
+          const response = await axios.get(
+            `https://gateguard-backend.onrender.com/order/get-order/${orderId}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
           setOrder(response.data);
         } catch (error) {
           console.error('Error fetching order details:', error);

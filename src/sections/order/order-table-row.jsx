@@ -39,7 +39,7 @@ export default function UserTableRow({
       const token = localStorage.getItem('token');
       try {
         const response = await axios.put(
-          `http://localhost:5000/order/cancel-order/${id}`,
+          `https://gateguard-backend.onrender.com/order/cancel-order/${id}`,
           {},
           {
             headers: {
@@ -65,7 +65,7 @@ export default function UserTableRow({
       const token = localStorage.getItem('token');
       try {
         const response = await axios.put(
-          `http://localhost:5000/order/complete-order/${id}`,
+          `https://gateguard-backend.onrender.com/order/complete-order/${id}`,
           {},
           {
             headers: {
