@@ -1,0 +1,28 @@
+/* scrollbar */
+@import 'simplebar-react/dist/simplebar.min.css';
+
+.mapboxgl-ctrl-geocoder {
+  display: none !important;
+}
+
+.mapbox-directions-profile {
+  display: none !important;
+}
+
+.mapbox-directions-component,
+.mapbox-directions-route-summary {
+  display: none !important;
+}
+
+.mapbox-directions-step-maneuver,
+.mapbox-directions-step-distance {
+  display: none !important;
+}
+
+::marker {
+  display: none !important;
+}
+
+.mapbox-directions-step {
+  display: none !important;
+}
