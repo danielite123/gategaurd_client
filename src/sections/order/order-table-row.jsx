@@ -72,8 +72,8 @@ export default function UserTableRow({
 
   const handleCompleteOrder = async () => {
     if (status === 'cancelled') {
-      console.log('Cannot complete order with cancelled status.');
-      toast.error('Cannot complete order with cancelled status.');
+      console.log('Cannot complete order with completed status.');
+      toast.error('Cannot complete order with completed status.');
       return; // Exit the function if the status is cancelled
     }
 
