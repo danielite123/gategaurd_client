@@ -1,6 +1,8 @@
 import axios from 'axios';
 import { useState } from 'react';
 import PropTypes from 'prop-types';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 import Stack from '@mui/material/Stack';
 import Popover from '@mui/material/Popover';
@@ -48,10 +50,12 @@ export default function UserTableRow({
           }
         );
         console.log('Order cancelled:', response.data);
+        toast.success('Order cancelled successfully');
 
         window.location.reload();
       } catch (error) {
         console.error('Error cancelling order:', error);
+        toast.error('Failed to cancel order. Please try again.');
       } finally {
         handleCloseMenu();
       }
@@ -61,6 +65,12 @@ export default function UserTableRow({
   };
 
   const handleCompleteOrder = async () => {
+    if (status === 'cancelled') {
+      console.log('Cannot complete order with cancelled status.');
+      toast.error('Cannot complete order with cancelled status.');
+      return; // Exit the function if the status is cancelled
+    }
+
     if (status !== 'pending') {
       const token = localStorage.getItem('token');
       try {
@@ -74,6 +84,8 @@ export default function UserTableRow({
           }
         );
         console.log('Order completed:', response.data);
+        toast.success('Order completed successfully');
+
         window.location.reload();
       } catch (error) {
         console.error('Error completing order:', error);
@@ -82,6 +94,7 @@ export default function UserTableRow({
       }
     } else {
       console.log('Cannot complete order with pending status.');
+      toast.error('Cannot complete order with pending status.');
     }
   };
 
