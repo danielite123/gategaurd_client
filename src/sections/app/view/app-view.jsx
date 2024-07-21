@@ -1,10 +1,12 @@
-import PropTypes from 'prop-types';
-import React, { useRef, useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import mapboxgl from 'mapbox-gl';
-import MapboxDirections from '@mapbox/mapbox-gl-directions/dist/mapbox-gl-directions';
-import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
 import axios from 'axios';
+import mapboxgl from 'mapbox-gl';
+import PropTypes from 'prop-types';
+import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
+import React, { useRef, useState, useEffect } from 'react';
+import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
+import 'react-toastify/dist/ReactToastify.css';
+import MapboxDirections from '@mapbox/mapbox-gl-directions/dist/mapbox-gl-directions';
 
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
@@ -70,6 +72,9 @@ export default function AppView(props) {
           params: {
             access_token: mapboxgl.accessToken,
             autocomplete: true,
+            country: 'NG', // Limit results to Nigeria
+            // Optionally specify the bounding box for Niger State, Nigeria
+            bbox: '4.9648,8.0737,7.9682,10.8680',
           },
         }
       );
@@ -138,9 +143,11 @@ export default function AppView(props) {
 
         const orderId = response.data._id; // Extract the order ID from the response
         console.log('Order placed successfully:', response.data);
+        toast.success('Order placed successfully!'); // Display success toast
         navigate(`/payment?orderId=${orderId}`); // Pass orderId as a query parameter
       } catch (error) {
         console.error('Error placing order:', error);
+        toast.error('Failed to place order.'); // Display error toast
       }
     } else {
       console.error('Please provide all required information.');

@@ -1,9 +1,11 @@
-import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import PropTypes from 'prop-types';
-import { loadStripe } from '@stripe/stripe-js';
-import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import { loadStripe } from '@stripe/stripe-js';
+import 'react-toastify/dist/ReactToastify.css';
+import React, { useEffect, useState } from 'react';
+import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
@@ -15,6 +17,7 @@ import Grid from '@mui/material/Unstable_Grid2';
 import Typography from '@mui/material/Typography';
 
 import Label from 'src/components/label';
+
 import PaymentMethods from '../payment-methods';
 
 const stripePromise = loadStripe(
@@ -57,12 +60,15 @@ const CheckoutForm = ({ order }) => {
 
         if (response.data.error) {
           console.error('Payment failed:', response.data.error);
+          toast.error('Payment failed');
         } else {
           console.log('Payment successful:', response.data);
           navigate('/');
+          toast.success('Payment successful');
         }
       } catch (error) {
         console.error('Error processing payment:', error);
+        toast.error('Failed to process payment. Please try again.');
       }
     }
   };
