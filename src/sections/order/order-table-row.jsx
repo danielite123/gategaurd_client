@@ -37,6 +37,12 @@ export default function UserTableRow({
   };
 
   const handleCancelOrder = async () => {
+    if (status === 'accepted') {
+      console.log('Cannot complete order with cancelled status.');
+      toast.error('Cannot complete order with cancelled status.');
+      return; // Exit the function if the status is cancelled
+    }
+
     if (status !== 'completed') {
       const token = localStorage.getItem('token');
       try {
