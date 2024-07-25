@@ -52,8 +52,13 @@ export default function LoginView() {
       localStorage.setItem('user', JSON.stringify(user));
       localStorage.setItem('userId', user._id);
 
-      // Redirect to another page after successful login
-      router.push('/upload');
+      if (user.profilePic) {
+        router.push("/")
+      }
+      else {
+        // Redirect to another page after successful login
+        router.push('/upload');
+      }
 
       console.log('Login successful', response);
       toast.success('Login successful');
