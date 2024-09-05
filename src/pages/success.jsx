@@ -13,21 +13,21 @@ const Success = () => {
   const orderId = query.get('orderId');
 
   useEffect(() => {
+    console.log('Query parameters:', sessionId, orderId); // Add this log
+
     const updatePaymentStatus = async () => {
       if (!sessionId || !orderId) {
-        console.error('Missing sessionId or orderId');
-        return; // Exit if either parameter is missing
+        console.error('Missing sessionId or orderId'); // This message will appear if either is missing
+        return;
       }
 
       try {
-        // Send POST request to update payment status to 'paid'
         const response = await axios.post(
           `https://gateguard-backend.onrender.com/order/update-payment/${orderId}`,
           {
             paymentStatus: 'paid',
           }
         );
-        // Optionally redirect or show a success message
         toast.success('Order updated successfully');
       } catch (error) {
         console.error('Error updating payment status:', error);
