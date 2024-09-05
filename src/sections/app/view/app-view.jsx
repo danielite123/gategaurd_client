@@ -169,18 +169,22 @@ export default function AppView(props) {
             <Stack spacing={3} mt={5}>
               <Autocomplete
                 fullWidth
-                options={routes.map((route) => route.from)}
+                options={[...new Set(routes.map((route) => route.from))].filter(
+                  (option) => option !== to
+                )} // Exclude 'to' value
                 renderInput={(params) => <TextField {...params} label="From" />}
                 value={from}
-                onChange={handleFromChange} // Updated handler
+                onChange={handleFromChange}
               />
 
               <Autocomplete
                 fullWidth
-                options={routes.map((route) => route.to)}
+                options={[...new Set(routes.map((route) => route.to))].filter(
+                  (option) => option !== from
+                )} // Exclude 'from' value
                 renderInput={(params) => <TextField {...params} label="To" />}
                 value={to}
-                onChange={handleToChange} // Updated handler
+                onChange={handleToChange}
                 sx={{ zIndex: 0 }}
               />
 
