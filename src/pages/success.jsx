@@ -14,24 +14,28 @@ const Success = () => {
 
   useEffect(() => {
     const updatePaymentStatus = async () => {
+      if (!sessionId || !orderId) {
+        console.error('Missing sessionId or orderId');
+        return; // Exit if either parameter is missing
+      }
+
       try {
         // Send POST request to update payment status to 'paid'
-        await axios.post(`https://gateguard-backend.onrender.com/order/update-payment/${orderId}`, {
-          paymentStatus: 'paid',
-        });
+        const response = await axios.post(
+          `https://gateguard-backend.onrender.com/order/update-payment/${orderId}`,
+          {
+            paymentStatus: 'paid',
+          }
+        );
         // Optionally redirect or show a success message
         toast.success('Order updated successfully');
       } catch (error) {
         console.error('Error updating payment status:', error);
-        // Handle the error
+        toast.error('Failed to update order');
       }
     };
 
-    if (sessionId && orderId) {
-      updatePaymentStatus();
-    }
-
-    updatePaymentStatus();
+    updatePaymentStatus(); // Call function to update payment
   }, [sessionId, orderId]);
 
   return (
