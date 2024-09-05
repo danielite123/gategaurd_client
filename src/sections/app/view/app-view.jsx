@@ -171,7 +171,7 @@ export default function AppView(props) {
                 fullWidth
                 options={[...new Set(routes.map((route) => route.from))].filter(
                   (option) => option !== to
-                )} // Exclude 'to' value
+                )} // Exclude 'to' value from the 'from' list
                 renderInput={(params) => <TextField {...params} label="From" />}
                 value={from}
                 onChange={handleFromChange}
@@ -179,9 +179,10 @@ export default function AppView(props) {
 
               <Autocomplete
                 fullWidth
-                options={[...new Set(routes.map((route) => route.to))].filter(
-                  (option) => option !== from
-                )} // Exclude 'from' value
+                options={routes
+                  .filter((route) => route.from === from) // Show only destinations linked to the selected 'from'
+                  .map((route) => route.to)
+                  .filter((option) => option !== from)} // Exclude 'from' value from 'to' list
                 renderInput={(params) => <TextField {...params} label="To" />}
                 value={to}
                 onChange={handleToChange}
