@@ -11,6 +11,8 @@ export const LoginPage = lazy(() => import('src/pages/login'));
 export const RegisterPage = lazy(() => import('src/pages/register'));
 export const PaymentPage = lazy(() => import('src/pages/payment'));
 export const UploadPage = lazy(() => import('src/pages/upload'));
+export const SuccessPage = lazy(() => import('src/pages/success'));
+export const CancelPage = lazy(() => import('src/pages/cancel'));
 export const Page404 = lazy(() => import('src/pages/page-not-found'));
 
 // ----------------------------------------------------------------------
@@ -46,6 +48,14 @@ export default function Router() {
     {
       path: 'payment',
       element: loggedIn ? <PaymentPage /> : <Navigate to="/login" replace />,
+    },
+    {
+      path: 'success',
+      element: <SuccessPage />,
+    },
+    {
+      path: 'cancel',
+      element: <CancelPage />,
     },
     {
       path: '404',

@@ -96,7 +96,7 @@ export default function RegisterView() {
             maxWidth: 420,
           }}
         >
-          <Typography variant="h4">Sign up to GateGaurd</Typography>
+          <Typography variant="h4">Sign up to Num Ride</Typography>
 
           <Typography variant="body2" sx={{ mt: 2, mb: 3 }}>
             Already have an account?

@@ -32,8 +32,11 @@ export default function LoginView() {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleClick = async () => {
+  const handleClick = async (e) => {
+    e.preventDefault();
+    setLoading(true);
     try {
       const response = await axios.post('https://gateguard-backend.onrender.com/user/login', {
         email,
@@ -53,9 +56,8 @@ export default function LoginView() {
       localStorage.setItem('userId', user._id);
 
       if (user.profilePic) {
-        router.push("/")
-      }
-      else {
+        router.push('/');
+      } else {
         // Redirect to another page after successful login
         router.push('/upload');
       }
@@ -113,6 +115,7 @@ export default function LoginView() {
         variant="contained"
         color="inherit"
         onClick={handleClick}
+        loading={loading}
       >
         Login
       </LoadingButton>
@@ -151,7 +154,7 @@ export default function LoginView() {
             }}
             variant="h4"
           >
-            Sign in to GateGuard
+            Sign in to Num Ride
           </Typography>
 
           <Typography variant="body2" sx={{ mt: 2, mb: 5 }}>

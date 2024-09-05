@@ -8,7 +8,7 @@ export default function UploadPage() {
   return (
     <>
       <Helmet>
-        <title> Login | GateGaurd </title>
+        <title> Login | Num Ride </title>
       </Helmet>
 
       <UploadView />

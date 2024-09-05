@@ -8,7 +8,7 @@ export default function UserPage() {
   return (
     <>
       <Helmet>
-        <title> User | GateGaurd </title>
+        <title> User | Num Ride </title>
       </Helmet>
 
       <UserView />

@@ -8,7 +8,7 @@ export default function AppPage() {
   return (
     <>
       <Helmet>
-        <title> Dashboard | GateGaurd </title>
+        <title> Dashboard | Num Ride </title>
       </Helmet>
 
       <AppView />

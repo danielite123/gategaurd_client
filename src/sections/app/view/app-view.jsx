@@ -1,12 +1,9 @@
 import axios from 'axios';
-import mapboxgl from 'mapbox-gl';
 import PropTypes from 'prop-types';
 import { toast } from 'react-toastify';
-import { useNavigate } from 'react-router-dom';
-import React, { useRef, useState, useEffect } from 'react';
-import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
 import 'react-toastify/dist/ReactToastify.css';
-import MapboxDirections from '@mapbox/mapbox-gl-directions/dist/mapbox-gl-directions';
+import { loadStripe } from '@stripe/stripe-js';
+import React, { useState, useEffect } from 'react';
 
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
@@ -16,119 +13,85 @@ import Container from '@mui/material/Container';
 import Grid from '@mui/material/Unstable_Grid2';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
+import Autocomplete from '@mui/material/Autocomplete';
 
 import Label from 'src/components/label';
 
-mapboxgl.accessToken =
-  'pk.eyJ1IjoibWlwYXNjaGFsIiwiYSI6ImNseXB5dnV4djBweDkya3F0aDh5N2N2MzUifQ.k5SttHIe-50qO95Kx-BFJQ'; // Replace with your Mapbox access token
-
-const calculatePrice = (distance) => {
-  return parseFloat(distance) * 10; // Example calculation: $10 per kilometer
-};
-
 export default function AppView(props) {
   const { sx, ...other } = props;
-  const navigate = useNavigate();
-  const mapContainer = useRef(null);
-  const map = useRef(null);
-  const [fromValue, setFromValue] = useState('');
-  const [toValue, setToValue] = useState('');
-  const [fromSuggestions, setFromSuggestions] = useState([]);
-  const [toSuggestions, setToSuggestions] = useState([]);
-  const [directions, setDirections] = useState(null);
-  const [distance, setDistance] = useState('');
-  const [duration, setDuration] = useState('');
-  const [price, setPrice] = useState(''); // Add price state
+  const [routes, setRoutes] = useState([]);
+  const [from, setFrom] = useState('');
+  const [to, setTo] = useState('');
+  const [distance, setDistance] = useState(null);
+  const [duration, setDuration] = useState(null);
+  const [price, setPrice] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  const stripePromise = loadStripe(
+    'pk_test_51PeJ6YECc33s4wLhAAcB2cL1CpUNFUzIRRdwLQakMo81Ua4KV4WgMqxg4FFwEyvzKSq0Cfbjpk8RF4smH4j7kw0U00UqgsjGzv'
+  );
 
   useEffect(() => {
-    if (map.current) return; // Initialize map only once
-    map.current = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: 'mapbox://styles/mapbox/streets-v11',
-      center: [-74.5, 40],
-      zoom: 9,
-      attributionControl: false,
-    });
+    // Fetch routes from backend
+    const fetchRoutes = async () => {
+      try {
+        const response = await axios.get('https://gateguard-backend.onrender.com/routes');
+        if (response.data.success) {
+          setRoutes(response.data.routes);
+        } else {
+          toast.error('Failed to fetch routes');
+        }
+      } catch (error) {
+        toast.error('Error fetching routes');
+      }
+    };
 
-    const directions = new MapboxDirections({
-      accessToken: mapboxgl.accessToken,
-      unit: 'metric',
-      profile: 'mapbox/driving',
-    });
-
-    map.current.addControl(directions, 'top-left');
-
-    setDirections(directions);
+    fetchRoutes();
   }, []);
 
-  const handleInputChange = async (e, setValue, setSuggestions) => {
-    const value = e.target.value;
-    setValue(value);
+  const handleCalculateRoutes = async () => {
+    if (from && to) {
+      try {
+        const response = await axios.post(
+          'https://gateguard-backend.onrender.com/routes/calculate-route',
+          {
+            from,
+            to,
+          }
+        );
 
-    try {
-      const response = await axios.get(
-        `https://api.mapbox.com/geocoding/v5/mapbox.places/${value}.json`,
-        {
-          params: {
-            access_token: mapboxgl.accessToken,
-            autocomplete: true,
-            country: 'NG', // Limit results to Nigeria
-            // Optionally specify the bounding box for Niger State, Nigeria
-            bbox: '4.9648,8.0737,7.9682,10.8680',
-          },
+        if (response.data.success) {
+          const { distance, duration, price } = response.data;
+
+          setDistance(distance);
+          setDuration(duration);
+          setPrice(price);
+
+          toast.success('Success');
+
+          //
+        } else {
+          toast.error(response.data.message || 'Error calculating route');
         }
-      );
-      const data = response.data;
-      setSuggestions(
-        data.features.map((feature) => ({
-          id: feature.id,
-          place_name: feature.place_name,
-          coordinates: feature.center,
-        }))
-      );
-    } catch (error) {
-      console.error('Error fetching suggestions:', error);
-    }
-  };
-
-  const handleSuggestionClick = (place_name, coordinates, setValue, setSuggestions, isFrom) => {
-    setValue(place_name);
-    setSuggestions([]);
-    if (isFrom) {
-      directions.setOrigin(coordinates);
+      } catch (error) {
+        toast.error('Route not found');
+      }
     } else {
-      directions.setDestination(coordinates);
-    }
-  };
-
-  const handleCalculateRoute = () => {
-    if (fromValue && toValue) {
-      directions.setOrigin(fromValue);
-      directions.setDestination(toValue);
-
-      directions.on('route', (event) => {
-        const route = event.route[0];
-        const distance = (route.distance / 1000).toFixed(2); // Convert meters to kilometers
-        const duration = (route.duration / 3600).toFixed(2); // Convert seconds to hours
-
-        setDistance(`${distance} km`);
-        setDuration(`${duration} hr`);
-
-        const calculatedPrice = calculatePrice(distance);
-        setPrice(`#${calculatedPrice.toFixed(2)}`); // Set the price
-      });
+      toast.error('Please select both "From" and "To" locations');
     }
   };
 
   const handlePlaceTrip = async () => {
-    if (fromValue && toValue && distance && duration && price) {
+    setLoading(true);
+    if (price) {
       try {
         const token = localStorage.getItem('token');
+
         const response = await axios.post(
           'https://gateguard-backend.onrender.com/order/create-order',
           {
-            from: fromValue,
-            to: toValue,
+            from,
+            to,
             distance,
             duration,
             price,
@@ -136,22 +99,36 @@ export default function AppView(props) {
           {
             headers: {
               Authorization: `Bearer ${token}`,
-              'Content-Type': 'application/json',
             },
           }
         );
 
-        const orderId = response.data._id; // Extract the order ID from the response
-        console.log('Order placed successfully:', response.data);
-        toast.success('Order placed successfully!'); // Display success toast
-        navigate(`/payment?orderId=${orderId}`); // Pass orderId as a query parameter
+        if (response.data.sessionId) {
+          const stripe = await stripePromise;
+          await stripe.redirectToCheckout({ sessionId: response.data.sessionId });
+        } else {
+          toast.error('Error creating checkout session');
+        }
       } catch (error) {
-        console.error('Error placing order:', error);
-        toast.error('Failed to place order.'); // Display error toast
+        toast.error('Error placing trip');
       }
     } else {
-      console.error('Please provide all required information.');
+      toast.error('Price is not available');
     }
+  };
+
+  const handleFromChange = (event, newValue) => {
+    setFrom(newValue);
+    setDistance(null); // Clear distance
+    setDuration(null); // Clear duration
+    setPrice(null); // Clear price
+  };
+
+  const handleToChange = (event, newValue) => {
+    setTo(newValue);
+    setDistance(null); // Clear distance
+    setDuration(null); // Clear duration
+    setPrice(null); // Clear price
   };
 
   return (
@@ -163,26 +140,16 @@ export default function AppView(props) {
       <Grid container rowSpacing={{ xs: 5, md: 0 }} columnSpacing={{ xs: 0, md: 5 }}>
         <Grid xs={12} md={8}>
           <Box
-            gap={5}
-            display="grid"
             sx={{
               borderRadius: 2,
-              border: (theme) => ({
-                md: `dashed 1px ${theme.palette.divider}`,
-              }),
+              bgcolor: 'background.neutral',
+              ...sx,
+              background: 'url("/assets/urban-city.png") no-repeat center center',
+              backgroundSize: 'cover',
+              height: '100%',
             }}
-          >
-            <Box
-              sx={{
-                borderRadius: 2,
-                bgcolor: 'background.neutral',
-                ...sx,
-              }}
-              {...other}
-            >
-              <div ref={mapContainer} style={{ height: '530px', width: '100%' }} />
-            </Box>
-          </Box>
+            {...other}
+          />
         </Grid>
 
         <Grid
@@ -200,83 +167,29 @@ export default function AppView(props) {
             <Typography variant="h6">Destination</Typography>
 
             <Stack spacing={3} mt={5}>
-              <TextField
+              <Autocomplete
                 fullWidth
-                label="From"
-                value={fromValue}
-                onChange={(e) => handleInputChange(e, setFromValue, setFromSuggestions, true)}
+                options={routes.map((route) => route.from)}
+                renderInput={(params) => <TextField {...params} label="From" />}
+                value={from}
+                onChange={handleFromChange} // Updated handler
               />
-              {fromSuggestions.length > 0 && (
-                <Box
-                  sx={{
-                    position: 'relative',
-                    zIndex: 1,
-                    bgcolor: 'background.paper',
-                    boxShadow: 1,
-                  }}
-                >
-                  {fromSuggestions.map((suggestion) => (
-                    <Box
-                      key={suggestion.id}
-                      sx={{ p: 2, cursor: 'pointer' }}
-                      onClick={() =>
-                        handleSuggestionClick(
-                          suggestion.place_name,
-                          suggestion.coordinates,
-                          setFromValue,
-                          setFromSuggestions,
-                          true
-                        )
-                      }
-                    >
-                      {suggestion.place_name}
-                    </Box>
-                  ))}
-                </Box>
-              )}
 
-              <TextField
+              <Autocomplete
                 fullWidth
-                label="To"
-                value={toValue}
-                onChange={(e) => handleInputChange(e, setToValue, setToSuggestions, false)}
+                options={routes.map((route) => route.to)}
+                renderInput={(params) => <TextField {...params} label="To" />}
+                value={to}
+                onChange={handleToChange} // Updated handler
                 sx={{ zIndex: 0 }}
               />
-              {toSuggestions.length > 0 && (
-                <Box
-                  sx={{
-                    position: 'relative',
-                    zIndex: 1,
-                    bgcolor: 'background.paper',
-                    boxShadow: 1,
-                  }}
-                >
-                  {toSuggestions.map((suggestion) => (
-                    <Box
-                      key={suggestion.id}
-                      sx={{ p: 2, cursor: 'pointer' }}
-                      onClick={() =>
-                        handleSuggestionClick(
-                          suggestion.place_name,
-                          suggestion.coordinates,
-                          setToValue,
-                          setToSuggestions,
-                          false
-                        )
-                      }
-                    >
-                      {suggestion.place_name}
-                    </Box>
-                  ))}
-                </Box>
-              )}
 
               <Button
                 fullWidth
                 size="large"
                 variant="contained"
                 sx={{ mt: 5, mb: 3 }}
-                onClick={handleCalculateRoute}
+                onClick={handleCalculateRoutes}
               >
                 Calculate Routes
               </Button>
@@ -285,24 +198,25 @@ export default function AppView(props) {
                 <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                   Distance
                 </Typography>
-                <Label color="success">{distance}</Label>
+                <Label color="success">{distance ? `${distance} km` : 'N/A'}</Label>
               </Stack>
 
               <Stack direction="row" justifyContent="space-between">
                 <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                   Duration
                 </Typography>
-                <Label color="success">{duration}</Label>
+                <Label color="success">{duration ? `${duration} min` : 'N/A'}</Label>
               </Stack>
 
               <Stack direction="row" justifyContent="space-between">
                 <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                   Price
                 </Typography>
-                <Label color="success">{price}</Label>
+                <Label color="success">{price ? `#${price}` : 'N/A'}</Label>
               </Stack>
 
               <Divider sx={{ borderStyle: 'dashed' }} />
+
               <Button
                 fullWidth
                 size="large"

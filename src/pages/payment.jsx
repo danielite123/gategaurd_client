@@ -8,7 +8,7 @@ export default function PaymentPage() {
   return (
     <>
       <Helmet>
-        <title> Payment | GateGaurd</title>
+        <title> Payment | Num Ride</title>
       </Helmet>
 
       <PaymentView />
