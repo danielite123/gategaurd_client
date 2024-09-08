@@ -51,10 +51,7 @@ export default function RegisterView() {
 
     try {
       console.log('Form Values:', formValues); // Debugging log
-      const response = await axios.post(
-        'https://gateguard-backend.onrender.com/user/register',
-        formValues
-      );
+      const response = await axios.post('http://localhost:5000/user/register', formValues);
       if (response.data.success) {
         router.push('/login');
         toast.success('Register successful');

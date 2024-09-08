@@ -34,7 +34,7 @@ export default function AccountPopover() {
         }
 
         // Fetch user data using the token
-        const response = await axios.get('https://gateguard-backend.onrender.com/user/profile', {
+        const response = await axios.get('http://localhost:5000/user/profile', {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -60,7 +60,7 @@ export default function AccountPopover() {
 
   const handleLogout = async () => {
     try {
-      const response = await axios.get('https://gateguard-backend.onrender.com/user/logout');
+      const response = await axios.get('http://localhost:5000/user/logout');
       if (response.status === 200) {
         // Clear token from localStorage or sessionStorage
         localStorage.removeItem('token');

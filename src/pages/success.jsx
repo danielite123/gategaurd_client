@@ -23,7 +23,7 @@ const Success = () => {
 
       try {
         const response = await axios.post(
-          `https://gateguard-backend.onrender.com/order/update-payment/${orderId}`,
+          `http://localhost:5000/order/update-payment/${orderId}`,
           {
             paymentStatus: 'paid',
           }

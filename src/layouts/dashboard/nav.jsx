@@ -40,7 +40,7 @@ export default function Nav({ openNav, onCloseNav }) {
         }
 
         // Fetch user data using the token
-        const response = await axios.get('https://gateguard-backend.onrender.com/user/profile', {
+        const response = await axios.get('http://localhost:5000/user/profile', {
           headers: {
             Authorization: `Bearer ${token}`,
           },

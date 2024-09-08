@@ -35,7 +35,7 @@ export default function AppView(props) {
     // Fetch routes from backend
     const fetchRoutes = async () => {
       try {
-        const response = await axios.get('https://gateguard-backend.onrender.com/routes');
+        const response = await axios.get('http://localhost:5000/routes');
         if (response.data.success) {
           setRoutes(response.data.routes);
         } else {
@@ -52,13 +52,10 @@ export default function AppView(props) {
   const handleCalculateRoutes = async () => {
     if (from && to) {
       try {
-        const response = await axios.post(
-          'https://gateguard-backend.onrender.com/routes/calculate-route',
-          {
-            from,
-            to,
-          }
-        );
+        const response = await axios.post('http://localhost:5000/routes/calculate-route', {
+          from,
+          to,
+        });
 
         if (response.data.success) {
           const { distance, duration, price } = response.data;
@@ -88,7 +85,7 @@ export default function AppView(props) {
         const token = localStorage.getItem('token');
 
         const response = await axios.post(
-          'https://gateguard-backend.onrender.com/order/create-order',
+          'http://localhost:5000/order/create-order',
           {
             from,
             to,
